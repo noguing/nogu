@@ -1,9 +1,6 @@
-from typing import Optional
-
 from fastapi import FastAPI
-from fastapi.params import Query
 
-from objects import glob
+from objects import request, glob
 
 app = FastAPI()
 
@@ -13,7 +10,8 @@ def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/beatmap/latest")
-async def latest_beatmap(limit: Optional[int] = Query(10, le=50), offset: int = 0):
-    cursor = glob.db_beatmap.find().sort("last_updated", -1).limit(limit).skip(offset)
-    return await cursor.to_list(length=100)
+@app.post("/oauth/token")
+def user_login(code: str):
+    authorization = request.user_authorize(code)
+    await glob.db_oauth_clients.update_one({"token": authorization['token']}, {"$set": authorization.copy()}, upsert=True)
+    return authorization
