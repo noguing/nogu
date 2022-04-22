@@ -10,8 +10,14 @@ def read_config(content: str) -> dict:
     return json.load(open(f"{os.getcwd()}\config.json", 'r'))[content]
 
 
+def get_url(path: str) -> str:
+    return f"http{'s' if config_app['https'] else ''}://{config_app['domain']}/{path}"
+
+
+config_app = read_config("app")
 config_mongo = read_config("mongo")
 config_oauth = read_config("oauth")
+config_proxy = read_config("proxy")
 
 osu_api = OssapiV2(config_oauth['client_id'], config_oauth['client_secret'])
 

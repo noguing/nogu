@@ -1,0 +1,18 @@
+{
+  "app": {
+    "domain": "localhost:8000",
+    "https": false
+  },
+  "mongo": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "nogu"
+  },
+  "oauth": {
+    "client_id": 12345,
+    "client_secret": ""
+  },
+  "proxy": {
+
+  }
+}

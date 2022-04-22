@@ -4,11 +4,7 @@ import requests
 from requests import HTTPError
 
 from objects import glob
-
-proxies = {
-    "http": "http://127.0.0.1:7890",
-    "https": "http://127.0.0.1:7890",
-}
+from objects.glob import get_url, config_proxy
 
 
 def user_authorize(code: str) -> dict[str, str]:
@@ -23,13 +19,13 @@ def user_authorize(code: str) -> dict[str, str]:
         "client_secret": glob.config_oauth['client_secret'],
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": glob.config_oauth['redirect_uri']
+        "redirect_uri": get_url("oauth/token")
     })
-    response = requests.post("https://osu.ppy.sh/oauth/token", data=data, headers=req_header, proxies=proxies)
+    response = requests.post("https://osu.ppy.sh/oauth/token", data=data, headers=req_header, proxies=config_proxy)
     if response.status_code == 200:
         result['token'] = response.json()['access_token']
         req_header['Authorization'] = f"Bearer {result['token']}"
-        response = requests.get("https://osu.ppy.sh/api/v2/me", headers=req_header, proxies=proxies)
+        response = requests.get("https://osu.ppy.sh/api/v2/me", headers=req_header, proxies=config_proxy)
         if response.status_code == 200:
             rep_json = response.json()
             result['avatar_url'] = rep_json['avatar_url']
