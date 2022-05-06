@@ -2,6 +2,7 @@ import json
 import os
 
 from motor.motor_asyncio import AsyncIOMotorClient
+from odmantic import AIOEngine
 from ossapi import OssapiV2
 from pymongo.database import Database
 
@@ -14,13 +15,19 @@ def get_url(path: str) -> str:
     return f"http{'s' if config_app['https'] else ''}://{config_app['domain']}/{path}"
 
 
-config_app = read_config("app")
-config_mongo = read_config("mongo")
-config_oauth = read_config("oauth")
-config_proxy = read_config("proxy")
+def get_db(database: str):
+    return AIOEngine(motor_client, database)
+
+
+config_app = read_config('app')
+config_mongo = read_config('mongo')
+config_oauth = read_config('oauth')
+config_proxy = read_config('proxy')
+
+motor_client: Database = AsyncIOMotorClient(config_mongo['host'], config_mongo['port'])[config_mongo['database']]
 
 osu_api = OssapiV2(config_oauth['client_id'], config_oauth['client_secret'])
 
-mongo_db: Database = AsyncIOMotorClient(config_mongo['host'], config_mongo['port'])[config_mongo['database']]
-db_beatmap = mongo_db['beatmapsets']
-db_oauth_clients = mongo_db['oauth_clients']
+db_oauth_clients = get_db('oauth_clients')
+db_users = get_db('users')
+db_teams = get_db('teams')
